@@ -38,7 +38,7 @@ class ShortLinkController extends Controller
             return back()->withErrors(['destination_url' => 'The provided URL is flagged as unsafe.']);
         }
 
-        $slug = $request->slug ?: Str::random(6);
+        $slug = $request->slug ? Str::lower($request->slug) : Str::random(6);
 
         while (ShortLink::where('slug', $slug)->exists()) {
             $slug = Str::random(6);
@@ -75,6 +75,10 @@ class ShortLinkController extends Controller
     {
         $this->authorize('update', $shortLink);
 
+        $targetSlug = Str::lower($request->slug);
+
+        $request->merge(['slug' => $targetSlug]);
+
         $request->validate([
             'title' => 'required|string|max:255',
             'destination_url' => 'required|url',
@@ -85,11 +89,11 @@ class ShortLinkController extends Controller
             return back()->withErrors(['destination_url' => 'The provided URL is flagged as unsafe.']);
         }
 
-        $slugChanged = $shortLink->slug !== $request->slug;
+        $slugChanged = $shortLink->slug !== $targetSlug;
 
         $shortLink->update([
             'title' => $request->title,
-            'slug' => $request->slug,
+            'slug' => $targetSlug,
         ]);
 
         if ($slugChanged || !$shortLink->qr_code_path || !Storage::disk('public')->exists($shortLink->qr_code_path)) {
