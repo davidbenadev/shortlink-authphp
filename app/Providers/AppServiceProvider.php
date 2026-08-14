@@ -26,5 +26,9 @@ class AppServiceProvider extends ServiceProvider
         if (app()->environment('production') || str_starts_with(config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }
+
+        \Illuminate\Support\Facades\RateLimiter::for('redirect', function (\Illuminate\Http\Request $request) {
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(60)->by($request->ip());
+        });
     }
 }

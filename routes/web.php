@@ -32,10 +32,7 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-// Rate limiter for redirect endpoint
-RateLimiter::for('redirect', function (Request $request) {
-    return Limit::perMinute(60)->by($request->ip());
-});
+
 
 // The redirect public route (must be at the end to not catch other routes)
 Route::get('/{slug}', RedirectController::class)
