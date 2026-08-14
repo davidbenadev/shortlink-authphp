@@ -12,8 +12,9 @@ class SecurityHeaders
         $response = $next($request);
 
         if (method_exists($response, 'header')) {
-            $response->header('X-Frame-Options', 'DENY');
-            $response->header('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");
+            $response->header('X-Frame-Options', 'SAMEORIGIN');
+            $response->header('X-Content-Type-Options', 'nosniff');
+            $response->header('Content-Security-Policy', "default-src 'self' https: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:; img-src 'self' data: https: blob:;");
         }
 
         return $response;
